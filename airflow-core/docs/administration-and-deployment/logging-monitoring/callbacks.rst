@@ -42,6 +42,13 @@ There are three different places where callbacks can be defined.
     By default, scheduler logs do not show up in the UI and instead can be found in
     ``$AIRFLOW_HOME/logs/scheduler/latest/DAG_FILE.py.log``
 
+.. warning::
+
+    **Task-level callbacks are not yet implemented.**
+    Although task-level callback definitions are accepted by the DAG API (e.g., ``on_failure_callback`` at the task level),
+    they are not executed in practice. Only DAG-level callbacks are currently executed.
+    See `Airflow Issue #44354 <https://github.com/apache/airflow/issues/44354>`_ for implementation status.
+
 Callback Types
 --------------
 
@@ -100,10 +107,9 @@ Before each task begins to execute, the ``task_execute_callback`` function will 
         dagrun_timeout=datetime.timedelta(minutes=60),
         catchup=False,
         on_success_callback=dag_success_alert,
-        default_args={"on_execute_callback": task_execute_callback},
         tags=["example"],
     ):
-        task1 = EmptyOperator(task_id="task1", on_failure_callback=[task_failure_alert])
+        task1 = EmptyOperator(task_id="task1")
         task2 = EmptyOperator(task_id="task2")
         task3 = EmptyOperator(task_id="task3")
         task1 >> task2 >> task3
